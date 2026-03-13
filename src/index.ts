@@ -1,8 +1,9 @@
 import * as core from '@actions/core';
+import * as github from '@actions/github';
 import { Orchestrator } from './Orchestrator.js';
 import { GitHubReporter } from './GitHubReporter.js';
-import { MockAIAnalyzer } from './analyzers/MockAIAnalyzer.js';
-import { MockSecretsAnalyzer } from './analyzers/MockSecretsAnalyzer.js';
+import { AIAnalyzer } from './analyzers/AIAnalyzer.js';
+import { SecretsAnalyzer } from './analyzers/SecretsAnalyzer.js';
 import { AutoFixHandler } from './AutoFixHandler.js';
 
 /**
@@ -17,19 +18,35 @@ async function run(): Promise<void> {
       throw new Error('GITHUB_TOKEN is not set.');
     }
 
+    const octokit = github.getOctokit(token);
     console.log(`Event Name: ${eventName}`);
 
     if (eventName === 'pull_request') {
       console.log('Starting Analysis Flow...');
       
+      const { owner, repo } = github.context.repo;
+      const pullNumber = github.context.payload.pull_request?.number;
+
+      if (!pullNumber) {
+        throw new Error('Pull request number not found in context.');
+      }
+
+      // Fetch the actual diff from GitHub
+      const { data: diff } = await octokit.rest.pulls.get({
+        owner,
+        repo,
+        pull_number: pullNumber,
+        mediaType: {
+          format: 'diff',
+        },
+      });
+
       const orchestrator = new Orchestrator([
-        new MockAIAnalyzer(),
-        new MockSecretsAnalyzer()
+        new AIAnalyzer(),
+        new SecretsAnalyzer()
       ]);
 
-      // In a real scenario, we would fetch the actual diff here.
-      const dummyDiff = 'diff --git a/src/index.ts b/src/index.ts...';
-      const aggregatedReport = await orchestrator.run(dummyDiff);
+      const aggregatedReport = await orchestrator.run(diff as unknown as string);
 
       const reporter = new GitHubReporter(token);
       await reporter.report(aggregatedReport);
