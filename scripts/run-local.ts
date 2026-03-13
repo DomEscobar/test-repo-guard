@@ -26,8 +26,8 @@ if (!fs.existsSync(eventPath)) {
 // Set GitHub Action environment variables
 process.env.GITHUB_EVENT_PATH = eventPath;
 process.env.GITHUB_EVENT_NAME = isFix ? 'issue_comment' : 'pull_request';
-process.env.GITHUB_REPOSITORY = 'octocat/Hello-World';
-process.env.GITHUB_TOKEN = 'mock-token';
+process.env.GITHUB_REPOSITORY = 'DomEscobar/test-repo-guard';
+process.env.GITHUB_TOKEN = process.env.GITHUB_TOKEN || 'mock-token';
 process.env.GITHUB_SHA = 'ec26c3e571111111111111111111111111111111';
 process.env.GITHUB_WORKSPACE = path.join(__dirname, '..');
 

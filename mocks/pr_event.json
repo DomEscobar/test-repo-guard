@@ -9,16 +9,16 @@
     "head": {
       "ref": "changes",
       "sha": "ec26c3e571111111111111111111111111111111",
-      "repo": { "full_name": "octocat/Hello-World" }
+      "repo": { "full_name": "DomEscobar/test-repo-guard" }
     },
     "base": {
       "ref": "master",
       "sha": "f95f852ad8f6b1b05645d4129f6363d46659e3ff",
-      "repo": { "full_name": "octocat/Hello-World" }
+      "repo": { "full_name": "DomEscobar/test-repo-guard" }
     }
   },
   "repository": {
-    "full_name": "octocat/Hello-World",
-    "owner": { "login": "octocat" }
+    "full_name": "DomEscobar/test-repo-guard",
+    "owner": { "login": "DomEscobar" }
   }
 }
