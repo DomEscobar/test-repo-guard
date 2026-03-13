@@ -7,13 +7,13 @@
     "user": { "login": "octocat" },
     "body": "Please pull these awesome changes in!",
     "head": {
-      "ref": "changes",
-      "sha": "ec26c3e571111111111111111111111111111111",
+      "ref": "feature/test-run",
+      "sha": "6694d9e545d21251b07bfcee65c1d816c13e72f5",
       "repo": { "full_name": "DomEscobar/test-repo-guard" }
     },
     "base": {
       "ref": "master",
-      "sha": "f95f852ad8f6b1b05645d4129f6363d46659e3ff",
+      "sha": "88298b962803e72f42131457582eac4d6113668b",
       "repo": { "full_name": "DomEscobar/test-repo-guard" }
     }
   },

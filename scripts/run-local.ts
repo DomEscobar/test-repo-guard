@@ -13,7 +13,8 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const eventType = process.argv[2] || 'pr';
+const eventType = process.argv[2];
+process.env.GITHUB_REF = 'refs/heads/master';
 const isFix = eventType === 'fix';
 const mockFile = isFix ? 'comment_event.json' : 'pr_event.json';
 const eventPath = path.join(__dirname, '..', 'mocks', mockFile);

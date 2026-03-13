@@ -1,0 +1,60 @@
+name: Repo Guard CI
+on:
+  pull_request:
+    # Run on opened, reopened, or synchronized events
+    types: [opened, synchronize, reopened]
+  issue_comment:
+    # Run when someone comments on a PR/Issue
+    types: [created]
+
+jobs:
+  repo_guard_analysis:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read # Need read to fetch diff
+      pull-requests: write # Need write to comment on PRs
+      issues: write # Need write to comment on PRs
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Required to get full diff context
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build Project
+        run: npm run build
+        
+      - name: Run Repo Guard Analysis Flow
+        # This executes the 'pull_request' logic in index.ts
+        run: node dist/index.js
+        env:
+          # Required for GitHub API operations (fetching diff, posting comment)
+          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }} 
+          # Required for the AIAnalyzer to function (use a real key here for production)
+          AI_API_KEY: \${{ secrets.AI_API_KEY }}
+          # Ensure the event name is set for the runner script
+          GITHUB_EVENT_NAME: pull_request 
+
+      - name: Run Repo Guard Auto-Fix Flow (Manual Trigger)
+        # This executes the 'issue_comment' logic in index.ts
+        # Only runs if a comment event is triggered, but we set the name here for documentation.
+        if: github.event_name == 'issue_comment' && contains(github.event.comment.body, '@opencode fix')
+        run: node dist/index.js
+        env:
+          GITHUB_TOKEN: \${{ secrets.GITHUB_TOKEN }}
+          GITHUB_EVENT_NAME: issue_comment
+          # Note: AutoFixHandler relies on GITHUB_EVENT_PATH being present in a real CI run, 
+          # which this manual step bypasses, but it shows intent.
+          
+  
+  # Optional: You might want a separate job for the Auto-Fix flow if it needs 'contents: write' 
+  # on the main branch for the push, but the AutoFixHandler handles pushing to the branch.
